@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signalisation ACGOMA</title>
+    <link rel="stylesheet" href="assets/css/output.css">
+    <script src="assets/js/jquery.js"></script>
+</head>
+
+<body class=" dark:text-neutral-100 text-stone-700 p-2">
+    <div
+        class="sticky top-0 text-center flex justify-between font-semibold text-xl uppercase bg-stone-100 dark:bg-slate-800 rounded p-1">
+        <span id="refid"></span>
+        <div class="p-1 bg-red-500 rounded-full text-white flex items-center justify-end">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path
+                    d="M5.85 3.5a.75.75 0 00-1.117-1 9.719 9.719 0 00-2.348 4.876.75.75 0 001.479.248A8.219 8.219 0 015.85 3.5zM19.267 2.5a.75.75 0 10-1.118 1 8.22 8.22 0 011.987 4.124.75.75 0 001.48-.248A9.72 9.72 0 0019.266 2.5z" />
+                <path fill-rule="evenodd"
+                    d="M12 2.25A6.75 6.75 0 005.25 9v.75a8.217 8.217 0 01-2.119 5.52.75.75 0 00.298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 107.48 0 24.583 24.583 0 004.83-1.244.75.75 0 00.298-1.205 8.217 8.217 0 01-2.118-5.52V9A6.75 6.75 0 0012 2.25zM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 004.496 0l.002.1a2.25 2.25 0 11-4.5 0z"
+                    clip-rule="evenodd" />
+            </svg>
+            <div class="absolute text-violet-800" id="nbrntf"></div>
+        </div>
+    </div>
+    <div class="my-2 p-1 bg-stone-100 dark:bg-slate-800 rounded-lg block">
+        <table class="w-full ">
+            <thead>
+                <tr class="p-2 text-white rounded-xl font-bold bg-violet-700">
+                    <td class="p-2 text-center w-[40px] rounded-l-lg">N°</td>
+                    <td class="p-2">Livre</td>
+                    <td class="p-2 w-[200px]">Chapitre</td>
+                    <td class="rounded-r-lg text-left p-2 ">Verset</td>
+                </tr>
+            </thead>
+            <tbody id="result">
+            </tbody>
+        </table>
+        <div id="meessageio" class="text-xl uppercase font-light text-neutral-400 text-center my-4">PAS DE REFERENCE
+            POUR LES
+            PREDICATIONS
+            <br> AVANT LE 15
+            AVRIL 2025
+        </div>
+
+    </div>
+
+    <script src="socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+        const parametres = new URLSearchParams(window.location.search);
+        const id = parametres.get('id');
+        $("#refid").html(`Réferences ${id}`);
+        var j = 0;
+        var k = 1;
+        var add = {};
+        socket.emit('triebyid', id);
+        socket.on('connected', (data) => {
+            const localvideoview = localStorage.getItem('videoVieuw');
+            var datas = data.data;
+            var datasId = data.socketId;
+
+
+
+            for (var i = 0; i < datas.length; i++) {
+                j++;
+                $('#result').append(`
+                <tr class="my-2 odd:bg-transparent even:bg-neutral-300 dark:even:bg-slate-700">
+                    <td class="rounded-l-lg p-2">${j}</td>
+                    <td class=" p-2">${datas[i].livre}</td>
+                    <td class="p-2">${datas[i].chapitre}</td>
+                    <td class="rounded-r-lg">${datas[i].verset}</td>
+                </tr>`);
+            }
+        });
+        socket.on('newverset', (data) => {
+            if (data[0] == id) {
+                $("#meessageio").hide();
+                j++; $("#nbrntf").html(k++)
+                $('#result').append(`
+                <tr class="my-2 odd:bg-transparent even:bg-neutral-300 dark:even:bg-slate-700">
+                    <td class="rounded-l-lg p-2">${j}</td>
+                    <td class=" p-2">${data[1]}</td>
+                    <td class="p-2">${data[2]}</td>
+                    <td class="rounded-r-lg">
+                        ${data[3]}
+                    </td>
+                </tr>`);
+                Notification.requestPermission().then((permission) => {
+                    if (permission === "granted") {
+                        const notification = new Notification("Noveau verset Ajouter", {
+                            body: data[1] + " chapitre " + data[2] + " Verset " + data[3],
+                            icon: 'http://localhost:8000/images/newlogo.png'
+                        })
+                    }
+                })
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>

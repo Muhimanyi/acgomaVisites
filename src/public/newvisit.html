@@ -1,0 +1,12 @@
+<script src="assets/js/jquery.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<div id="ok"></div>
+<script>
+    const socket = io();
+    const parametres = new URLSearchParams(window.location.search);
+    const ip = parametres.get('ip');
+    const heure = parametres.get('heure');
+    socket.emit('connectednow');
+    socket.emit('newvisit', [ip, heure]);
+    $("#ok").html(ip + " " + heure);
+</script>

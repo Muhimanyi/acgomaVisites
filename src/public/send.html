@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signalisation ACGOMA</title>
+    <link rel="stylesheet" href="assets/css/output.css">
+    <script src="assets/js/jquery.js"></script>
+
+</head>
+
+<body class=" dark:text-neutral-100 text-stone-700 p-2">
+    <div class="bg-stone-100 dark:bg-slate-700 rounded-lg p-2 flex gap-2 flex-wrap justify-between">
+        <input type="text" id="livre"
+            class="h-10 rounded bg-transparent px-1 border border-gray-500 dark:border-slate-600" placeholder="Livre..."
+            style="transition: 300ms;">
+        <input type="text" id="chapitre"
+            class="h-10 rounded bg-transparent px-1 border border-gray-500 dark:border-slate-600"
+            placeholder="Chapitre..." style="transition: 300ms;">
+        <input type="text" id="verset"
+            class="h-10 rounded bg-transparent px-1 border border-gray-500 dark:border-slate-600"
+            placeholder="Verset..." style="transition: 300ms;">
+        <button id="envoyer" class="bg-blue-500 hover:bg-blue-600 rounded-lg px-2">Envoyer</button>
+    </div>
+</body>
+<script src="socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    const parametres = new URLSearchParams(window.location.search);
+    const id = parametres.get('id');
+
+    document.getElementById('envoyer').addEventListener('click', () => {
+        var message = [id, $("#livre").val(), $("#chapitre").val(), $("#verset").val()];
+        socket.emit('verset', message);
+    });
+
+    socket.on('newverset', (data) => {
+        console.log(data)
+    })
+</script>

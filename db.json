@@ -1,0 +1,130 @@
+{
+  "reference": [
+    {
+      "id": "19872",
+      "livre": "Marc",
+      "chapitre": "2",
+      "verset": "1"
+    },
+    {
+      "id": "19872",
+      "livre": "Esai",
+      "chapitre": "45",
+      "verset": "3"
+    },
+    {
+      "id": "19872",
+      "livre": "Esai",
+      "chapitre": "45",
+      "verset": "12"
+    },
+    {
+      "id": "19872",
+      "livre": "Jaques",
+      "chapitre": "2",
+      "verset": "6"
+    },
+    {
+      "id": "19872",
+      "livre": "Brochure Le respect",
+      "chapitre": "page 16",
+      "verset": "Paragraphe 56"
+    },
+    {
+      "id": null,
+      "livre": "Actes",
+      "chapitre": "2",
+      "verset": "12"
+    },
+    {
+      "id": "19872",
+      "livre": "Brochure Les oint du temps de la fin",
+      "chapitre": "Page 3",
+      "verset": "Paragraphe 23"
+    },
+    {
+      "id": "19872",
+      "livre": "Brochure Les oint du temps de la fin",
+      "chapitre": "Page 3",
+      "verset": "Paragraphe 23"
+    },
+    {
+      "id": "19872",
+      "livre": "Brochure Les oint du temps de la fin",
+      "chapitre": "Page 3",
+      "verset": "Paragraphe 23"
+    },
+    {
+      "id": "19871",
+      "livre": "Genese",
+      "chapitre": "6",
+      "verset": "1"
+    },
+    {
+      "id": "19871",
+      "livre": "Nombre",
+      "chapitre": "1",
+      "verset": "16"
+    },
+    {
+      "id": "19871",
+      "livre": "Deuteronome",
+      "chapitre": "22",
+      "verset": "16"
+    },
+    {
+      "id": "19871",
+      "livre": "Exode",
+      "chapitre": "4",
+      "verset": "14"
+    },
+    {
+      "id": "19871",
+      "livre": "Mathiew",
+      "chapitre": "24",
+      "verset": "24"
+    },
+    {
+      "id": "19871",
+      "livre": "Mathiew",
+      "chapitre": "24",
+      "verset": "24"
+    }
+  ],
+  "visites": [
+    {
+      "ip": "123",
+      "heure": "12/12"
+    },
+    {
+      "ip": "127.0.0.1",
+      "heure": "06:25"
+    },
+    {
+      "ip": "127.0.0.1",
+      "heure": "10:15"
+    },
+    {
+      "ip": "127.0.0.1",
+      "heure": "10:16"
+    },
+    {
+      "ip": "127.0.0.1",
+      "heure": "10:17"
+    }
+  ],
+  "connected": [
+    {
+      "id": "_X5zzwqzoWc7-tYxAAAP",
+      "jour": "4/21/2025"
+    },
+    {
+      "id": "oC7nBpdelyRMXPACAABb",
+      "jour": "4/21/2025"
+    },
+    {
+      "id": "RkB3zMoQKeavGTiAAABd",
+      "jour": "4/21/2025"
+    }
+  ]
+}

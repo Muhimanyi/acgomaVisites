@@ -1,0 +1,63 @@
+<link rel="stylesheet" href="assets/css/output.css">
+
+<section class="w-full flex gap-2 justify-between md:block">
+    <div class="w-1/2 md:w-full">
+        <canvas id="myChart1" class="w-full bg-stone-100 dark:bg-slate-800 p-1 rounded-lg"></canvas>
+    </div>
+    <div class="w-1/2 md:w-full">
+        <div class="ok"></div>
+        <canvas id="myChart2" class="w-full bg-stone-100 dark:bg-slate-800 p-1 rounded-lg"></canvas>
+    </div>
+
+</section>
+
+<script src="assets/js/graph.js"></script>
+<script src="socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    var nbrvisites;
+    var date = new Date();
+    socket.on('visitesizi', (data) => {
+        console.log(data)
+    })
+    socket.on('getvisitresponse', (data) => {
+
+        var datas = data.connected;
+        drowchart(date.toLocaleDateString(), datas.length)
+
+    })
+    var chart1 = document.getElementById('myChart1').getContext('2d');
+    var chart2 = document.getElementById('myChart2').getContext('2d');
+
+    function drowchart(label, datas) {
+        var myChart1 = new Chart(chart1,
+            {
+                type: 'bar',
+                data:
+                {
+                    labels: [label],
+                    datasets: [{
+                        label: label,
+                        data: [datas],
+                        backgroundColor: ['rgba(0, 0, 100,0.5)', 'red', 'blue', 'green', 'yellow'],
+                        color: ['white', 'gray'],
+                        borderWidth: 1
+                    }]
+                },
+                options:
+                {
+                    scales:
+                    {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+
+
+
+    }
+</script>
