@@ -7,6 +7,8 @@
     <title>Signalisation ACGOMA</title>
     <link rel="stylesheet" href="assets/css/output.css">
     <script src="assets/js/jquery.js"></script>
+        <script src="https://acgomavisites.onrender.com/socket.io/socket.io.js"></script>
+
 </head>
 
 <body
@@ -29,7 +31,6 @@
         </p>
     </div>
 
-    <script src="socket.io/socket.io.js"></script>
 
     <script>
 
@@ -47,7 +48,7 @@
             const audio = document.getElementById("audio");
             audio.src = data.links.lien;
             audio.play();
-            console.log('play in')
+            console.log(data+'playing')
         })
 
 
