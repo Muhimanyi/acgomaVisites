@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signalisation ACGOMA</title>
+    <link rel="stylesheet" href="assets/css/output.css">
+    <script src="assets/js/jquery.js"></script>
+</head>
+
+<body class="p-2 dark:text-neutral-100 text-stone-700">
+    <div class="flex w-full gap-2 p-2">
+        <input type="text" id="link" class="w-full h-10 pl-2 bg-transparent border rounded-lg"
+            style="padding-left: 10px;" placeholder="Audio Live link here...">
+        <button class="p-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600" onclick="live()">Lancer</button>
+    </div>
+    <script src="socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+        function live() {
+            socket.emit('live', $("#link").val());
+        }
+    </script>
+</body>
+
+</html>
