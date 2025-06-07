@@ -13,6 +13,7 @@ app.use(express.static('src/public'));
 
 io.on('connection', (socket) => {
     const connected = JSON.parse(fs.readFileSync('db.json', 'utf-8'));
+    const link = JSON.parse(fs.readFileSync('dblinks.json', 'utf-8'));
 
     const date = new Date();
     const newconnected = {
@@ -24,6 +25,7 @@ io.on('connection', (socket) => {
 
     const conne = JSON.parse(fs.readFileSync('db.json', 'utf-8'));
     socket.emit('getvisitresponse', conne);
+    socket.emit('links', link);
     console.log('user conected')
 
     socket.on('triebyid', (data) => {
@@ -59,6 +61,16 @@ io.on('connection', (socket) => {
     });
 
 
+    socket.on('live', (data) => {
+        const link = JSON.parse(fs.readFileSync('dblinks.json', 'utf-8'));
+
+        const newlink = {
+            "lien": data
+        }
+        link.links = newlink;
+        fs.writeFileSync('dblinks.json', JSON.stringify(link, null, 2));
+        socket.broadcast.emit('liveAudio', data);
+    })
 
 
     socket.on('disconnect', () => {
@@ -75,6 +87,7 @@ io.on('connection', (socket) => {
 
     });
 })
+
 
 
 server.listen(3000, () => {
