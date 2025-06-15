@@ -20,7 +20,8 @@
     <script>
         const socket = io();
         function live() {
-            socket.emit('live', $("#link").val());
+            var link=$("#link").val()+"/live";
+            socket.emit('live', link);
         }
     </script>
 </body>
