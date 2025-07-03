@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Signalisation ACGOMA - Web Radio</title>
     <script src="https://acgomavisites.onrender.com/socket.io/socket.io.js"></script>
     <style>
-        /* Reset basique */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -68,7 +66,6 @@
             transform: scale(1.1);
         }
 
-        /* Animation pulsante douce */
         .play-button:active {
             transform: scale(0.95);
         }
@@ -102,7 +99,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="radio-container">
         <div class="play-button" id="playPauseBtn" onclick="toggleAudio()" aria-label="Play/Pause">
@@ -116,10 +112,12 @@
         <div class="radio-title">ASSEMBLEE CHRETIENNE DE GOMA TMK - WEB-RADIO</div>
 
         <audio id="audio" controls>
-            <a href="https://acgoma.org/live">Pas d'audio pour l'instant</a>
+            <a href="#">Pas d'audio pour l'instant</a>
         </audio>
+
         <canvas id="oscilloscope" height="80"
-            style="margin-top: 15px; border-radius:8px; box-shadow: 0 0 15px rgba(111,66,193,0.6); background: rgba(45,45,77,0.5);">
+            style="width:100%; margin-top: 15px; border-radius:8px;
+            box-shadow: 0 0 15px rgba(111,66,193,0.6); background: rgba(45,45,77,0.5);">
         </canvas>
 
         <div class="status-text" id="statusText">Cliquez sur le bouton pour démarrer la lecture</div>
@@ -129,12 +127,16 @@
         const socket = io();
         const audio = document.getElementById("audio");
         const icon = document.getElementById("icon");
-        const playPauseBtn = document.getElementById("playPauseBtn");
         const statusText = document.getElementById("statusText");
+        const canvas = document.getElementById('oscilloscope');
+        const ctx = canvas.getContext('2d');
 
         let isPlaying = false;
         let currentSource = "";
         let userHasInteracted = false;
+        let audioCtx, analyser, source, dataArray, bufferLength;
+
+        canvas.width = canvas.clientWidth; // adaptatif
 
         function updateIcon() {
             if (isPlaying) {
@@ -177,6 +179,7 @@
         audio.addEventListener('play', () => {
             isPlaying = true;
             updateIcon();
+            initVisualizer();
         });
 
         audio.addEventListener('pause', () => {
@@ -204,76 +207,58 @@
             }
         });
 
+        function initVisualizer() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+
+                source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                ctx.lineCap = "round";
+                audioCtx.resume().then(() => {
+                    drawSpectrum();
+                });
+            }
+        }
+
+        function drawSpectrum() {
+            requestAnimationFrame(drawSpectrum);
+            analyser.getByteFrequencyData(dataArray);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(45,45,77,0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const barWidth = (canvas.width / bufferLength) * 2.0;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const value = dataArray[i];
+                const barHeight = value * 0.5;
+
+                const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
+                gradient.addColorStop(0, "#805ad5");
+                gradient.addColorStop(1, "#9f7aea");
+
+                ctx.shadowColor = '#9f7aea';
+                ctx.shadowBlur = 10;
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                ctx.fillRect(x, 0, barWidth, barHeight * 0.3);
+
+                x += barWidth + 1;
+            }
+
+            ctx.shadowBlur = 0;
+        }
+
         updateIcon();
-
-
-
-    const canvas = document.getElementById('oscilloscope');
-    const ctx = canvas.getContext('2d');
-    let audioCtx, analyser, source, dataArray, bufferLength;
-
-    function initVisualizer() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
-
-            source = audioCtx.createMediaElementSource(audio);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-
-            ctx.lineCap = "round";
-            drawSpectrum();
-        }
-    }
-
-    function drawSpectrum() {
-        requestAnimationFrame(drawSpectrum);
-        analyser.getByteFrequencyData(dataArray);
-
-        // Clear canvas with transparent background
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(45,45,77,0.2)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const barWidth = (canvas.width / bufferLength) * 2.0;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-            const value = dataArray[i];
-            const barHeight = value * 0.5;
-
-            // Dégradé néon
-            const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-            gradient.addColorStop(0, "#805ad5");
-            gradient.addColorStop(1, "#9f7aea");
-
-            // Glow effet
-            ctx.shadowColor = '#9f7aea';
-            ctx.shadowBlur = 10;
-
-            ctx.fillStyle = gradient;
-
-            // Barres en haut
-            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-
-            // Barres en miroir en bas (effet stylé)
-            ctx.fillRect(x, 0, barWidth, barHeight * 0.3);
-
-            x += barWidth + 1;
-        }
-
-        // Reset glow
-        ctx.shadowBlur = 0;
-    }
-
-    audio.addEventListener('play', () => {
-        initVisualizer();
-    });
-</script>
-
+    </script>
 </body>
-
 </html>
