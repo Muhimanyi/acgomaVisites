@@ -1,15 +1,208 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Test audio streaming simple</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Signalisation ACGOMA - Web Radio</title>
+    <script src="https://acgomavisites.onrender.com/socket.io/socket.io.js"></script>
+    <style>
+        /* Reset basique */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            background: url('live_audio.webp') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-attachment: fixed;
+        }
+
+        .radio-container {
+            background: rgba(20, 20, 35, 0.75);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+            width: 320px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .radio-title {
+            font-size: 1.7rem;
+            margin-bottom: 25px;
+            text-shadow: 0 0 8px #2b5ce2;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .play-button {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #6b46c1, #9f7aea);
+            border-radius: 50%;
+            box-shadow:
+                0 0 15px #9f7aea,
+                inset 0 0 20px #6b46c1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(135deg, #9f7aea, #6b46c1);
+            box-shadow:
+                0 0 25px #b794f4,
+                inset 0 0 30px #805ad5;
+            transform: scale(1.1);
+        }
+
+        /* Animation pulsante douce */
+        .play-button:active {
+            transform: scale(0.95);
+        }
+
+        svg {
+            fill: white;
+            width: 56px;
+            height: 56px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7));
+        }
+
+        audio {
+            width: 100%;
+            outline: none;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(111, 66, 193, 0.6);
+            margin-top: 10px;
+            background: #2d2d4d;
+            color: white;
+        }
+
+        .status-text {
+            margin-top: 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #b0b0d3;
+            min-height: 1.2em;
+            user-select: text;
+            font-style: italic;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Test simple flux audio</h2>
-    <audio controls crossorigin="anonymous" style="width:300px;">
-        <source src="https://converted-triumph-edwards-lots.trycloudflare.com/live" />
-        Votre navigateur ne supporte pas l'élément audio.
-    </audio>
+    <div class="radio-container">
+        <div class="play-button" id="playPauseBtn" onclick="toggleAudio()" aria-label="Play/Pause">
+            <svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill-rule="evenodd"
+                    d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                    clip-rule="evenodd" />
+            </svg>
+        </div>
+
+        <div class="radio-title">ASSEMBLEE CHRETIENNE DE GOMA TMK - WEB-RADIO</div>
+
+        <audio id="audio" controls>
+            <a href="https://acgoma.org/live">Pas d'audio pour l'instant</a>
+        </audio>
+
+        <div class="status-text" id="statusText">Cliquez sur le bouton pour démarrer la lecture</div>
+    </div>
+
+    <script>
+        const socket = io();
+        const audio = document.getElementById("audio");
+        const icon = document.getElementById("icon");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const statusText = document.getElementById("statusText");
+
+        let isPlaying = false;
+        let currentSource = "";
+        let userHasInteracted = false;
+
+        function updateIcon() {
+            if (isPlaying) {
+                icon.innerHTML = `
+                    <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+                    <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+                `;
+                statusText.textContent = "En lecture...";
+            } else {
+                icon.innerHTML = `
+                    <path fill-rule="evenodd"
+                        d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                        clip-rule="evenodd" />
+                `;
+                statusText.textContent = userHasInteracted ? "Lecture en pause" : "Cliquez sur le bouton pour démarrer la lecture";
+            }
+        }
+
+        function toggleAudio() {
+            if (!currentSource) {
+                alert("Le flux audio n'est pas encore prêt. Veuillez patienter...");
+                return;
+            }
+
+            if (!userHasInteracted) {
+                userHasInteracted = true;
+                audio.src = currentSource;
+            }
+
+            if (audio.paused) {
+                audio.play().catch(e => {
+                    console.log("Lecture bloquée :", e);
+                    statusText.textContent = "Impossible de lire le flux audio.";
+                });
+            } else {
+                audio.pause();
+            }
+        }
+
+        audio.addEventListener('play', () => {
+            isPlaying = true;
+            updateIcon();
+        });
+
+        audio.addEventListener('pause', () => {
+            isPlaying = false;
+            updateIcon();
+        });
+
+        socket.on('liveAudio', (data) => {
+            console.log('liveAudio:', data);
+            currentSource = data;
+            if (userHasInteracted) {
+                audio.src = currentSource;
+                audio.play().catch(e => console.log("Lecture bloquée :", e));
+            }
+        });
+
+        socket.on('links', (data) => {
+            if (data.links && data.links.lien) {
+                console.log('links:', data.links.lien);
+                currentSource = data.links.lien;
+                if (userHasInteracted) {
+                    audio.src = currentSource;
+                    audio.play().catch(e => console.log("Lecture bloquée :", e));
+                }
+            }
+        });
+
+        updateIcon();
+    </script>
 </body>
+
 </html>
