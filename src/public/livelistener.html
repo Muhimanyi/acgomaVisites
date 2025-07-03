@@ -1,76 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
-<title>Test AudioContext</title>
-<style>
-    body { background: #222; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;}
-    canvas { margin-top: 20px; border-radius:8px; box-shadow:0 0 15px rgba(111,66,193,0.6); background: rgba(45,45,77,0.5);}
-</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Test audio streaming simple</title>
 </head>
 <body>
-
-<audio id="audio" controls crossorigin="anonymous"></audio>
-<canvas id="oscilloscope" height="80" style="width:300px;"></canvas>
-
-<script>
-const audio = document.getElementById("audio");
-const canvas = document.getElementById('oscilloscope');
-const ctx = canvas.getContext('2d');
-canvas.width = canvas.clientWidth;
-
-let audioCtx, analyser, source, dataArray, bufferLength;
-
-audio.src = "https://converted-triumph-edwards-lots.trycloudflare.com/live" // mets ton lien mp3/aac direct
-audio.load();
-
-audio.addEventListener('play', () => {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-
-        source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-
-        audioCtx.resume().then(() => drawSpectrum());
-    }
-});
-
-function drawSpectrum() {
-    requestAnimationFrame(drawSpectrum);
-    analyser.getByteFrequencyData(dataArray);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(45,45,77,0.2)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const barWidth = (canvas.width / bufferLength) * 2.0;
-    let x = 0;
-
-    for (let i = 0; i < bufferLength; i++) {
-        const value = dataArray[i];
-        const barHeight = value * 0.5;
-
-        const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-        gradient.addColorStop(0, "#805ad5");
-        gradient.addColorStop(1, "#9f7aea");
-
-        ctx.shadowColor = '#9f7aea';
-        ctx.shadowBlur = 10;
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-        ctx.fillRect(x, 0, barWidth, barHeight * 0.3);
-
-        x += barWidth + 1;
-    }
-
-    ctx.shadowBlur = 0;
-}
-</script>
+    <h2>Test simple flux audio</h2>
+    <audio controls crossorigin="anonymous" style="width:300px;">
+        <source src="https://converted-triumph-edwards-lots.trycloudflare.com/live" />
+        Votre navigateur ne supporte pas l'élément audio.
+    </audio>
 </body>
 </html>
