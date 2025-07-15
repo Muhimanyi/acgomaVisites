@@ -18,12 +18,11 @@
 
         .radio-container {
             background: rgba(20, 20, 35, 0.75);
-            padding: 40px 50px;
+            padding: 40px;
             border-radius: 15px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
-            width: 320px;
+            width:auto;
             text-align: center;
-            user-select: none;
             display:flex;
             gap:10px;
         }
@@ -96,22 +95,22 @@
     </style>
 </head>
 
-<body>
-    <div class="radio-container">
-        <div class="play-button" id="playPauseBtn" onclick="toggleAudio()" aria-label="Play/Pause">
-            <svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fill-rule="evenodd"
-                    d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                    clip-rule="evenodd" />
-            </svg>
+<body style="display:flex; align-items:center; justify-content:center;>
+    <div style="display:block;">
+        <div class="radio-container">
+            <div class="play-button" id="playPauseBtn" onclick="toggleAudio()" aria-label="Play/Pause">
+                <svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                        d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+            <audio id="audio" controls>
+                <a href="https://acgoma.org/live">Pas d'audio pour l'instant</a>
+            </audio>
         </div>
-        <audio id="audio" controls>
-            <a href="https://acgoma.org/live">Pas d'audio pour l'instant</a>
-        </audio>
+        <div class="status-text" id="statusText">Cliquez sur le bouton pour démarrer la lecture</div>
     </div>
-<div class="status-text" id="statusText">Cliquez sur le bouton pour démarrer la lecture</div>
-
-
     <script>
         const socket = io();
         const audio = document.getElementById("audio");
