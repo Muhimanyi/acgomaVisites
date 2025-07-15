@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Signalisation ACGOMA - Web Radio</title>
     <script src="https://acgomavisites.onrender.com/socket.io/socket.io.js"></script>
-    <style>
+<!--     <style>
         /* Reset basique */
         * {
             box-sizing: border-box;
@@ -100,11 +100,11 @@
             user-select: text;
             font-style: italic;
         }
-    </style>
+    </style> -->
 </head>
 
 <body>
-    <div class="radio-container">
+    <div class="radio-container" style="display:flex; align-items:center; justify-content:center; gap:5px;">
         <div class="play-button" id="playPauseBtn" onclick="toggleAudio()" aria-label="Play/Pause">
             <svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill-rule="evenodd"
@@ -112,15 +112,12 @@
                     clip-rule="evenodd" />
             </svg>
         </div>
-
-        <div class="radio-title">ASSEMBLEE CHRETIENNE DE GOMA TMK - WEB-RADIO</div>
-
         <audio id="audio" controls>
             <a href="https://acgoma.org/live">Pas d'audio pour l'instant</a>
         </audio>
-
-        <div class="status-text" id="statusText">Cliquez sur le bouton pour démarrer la lecture</div>
     </div>
+<div class="status-text" id="statusText">Cliquez sur le bouton pour démarrer la lecture</div>
+
 
     <script>
         const socket = io();
